@@ -84,10 +84,6 @@ async def on_message(message):
         # メッセージが送られてきたチャンネルに "Hello World..." を返す
         await client.send_message(message.channel, 'Hello World...')
 
-    if message.content.startswith('!oppai'):
-        # メッセージが送られてきたチャンネルに "Hello World..." を返す
-        await client.send_file(message.channel, r'C:\Users\sioiyan\Pictures\nonooppai.jpg' )
-
     if message.content.startswith('!siai'):
         senddata=""
         siaiurl = "";
