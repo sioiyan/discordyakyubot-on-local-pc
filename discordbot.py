@@ -171,7 +171,7 @@ async def on_message(message):
             senddata = "今日は試合がないようです。もしくはまだ予告先発が発表されていません。"
             print(e)
         await client.send_message(message.channel, senddata)
-    #試合中の場合試合状況をdiscord上に投稿
+    #試合中の場合,試合状況をキャプチャしてdiscord上に投稿
     if message.content.startswith('!baystars') or message.content.startswith('!carp') or message.content.startswith('!tigers') or message.content.startswith('!giants') or message.content.startswith('!dragons') or message.content.startswith('!swallows')\
     or message.content.startswith('!lions') or message.content.startswith('!fighters') or message.content.startswith('!hawks') or message.content.startswith('!marines') or message.content.startswith('!buffaloes') or message.content.startswith('!eagles')\
     or message.content.startswith('!de') or message.content.startswith('!softbank') or message.content.startswith('!hanshin') or message.content.startswith('!tora') or message.content.startswith('!koi') or message.content.startswith('!yakult') or message.content.startswith('!hiroshima')\
