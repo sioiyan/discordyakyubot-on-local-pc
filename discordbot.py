@@ -88,24 +88,6 @@ async def on_message(message):
         # メッセージが送られてきたチャンネルに "Hello World..." を返す
         await client.send_file(message.channel, r'C:\Users\sioiyan\Pictures\nonooppai.jpg' )
 
-    if message.content.startswith('!ero'):
-        imgurl=""
-        while True:
-            erourl = 'http://www.rental-img.com/first/'
-            erosoup = returnsoup(erourl)
-            imgurlobj = erosoup.find('img')
-            try:
-                imgurl = imgurlobj['src']
-            except:
-                imgurl = ""
-                continue;
-            if imgurl.endswith('.jpg') == True:
-                imgurl = imgurl.replace('..' , '')
-                imgurl = r'http://www.rental-img.com' + imgurl
-                break;
-            time.sleep(0.5)
-        await client.send_message(message.channel, imgurl)
-
     if message.content.startswith('!siai'):
         senddata=""
         siaiurl = "";
