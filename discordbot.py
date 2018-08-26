@@ -1,7 +1,7 @@
 #coding: utf-8
 
 # 上記で取得したアプリのトークンを入力
-BOT_TOKEN = "xxx"
+BOT_TOKEN = "NDMwNTYwNjY5Njk2NTI0Mjk5.DaR-aw.sEUcdNZYHdej3RvLc9sfm7tADHA"
 
 # パッケージのインポートとインスタンス作成
 import discord
@@ -19,13 +19,13 @@ def todayyakyuurl():
     today = datetime.date.today()
     url = "https://baseball.yahoo.co.jp/npb/schedule/?date=%d%02d%02d" % (today.year, today.month, today.day)
 
-    # URLにアクセスする htmlが帰ってくる → <html><head><title>経済、株価、ビジネス、政治のニュース:日経電子版</title></head><body....
+    # URLにアクセスする
     html = urllib.request.urlopen(url)
 
     # htmlをBeautifulSoupで扱う
     soup = BeautifulSoup(html, "lxml")
 
-    # span要素全てを摘出する→全てのspan要素が配列に入ってかえされます→[<span class="m-wficon triDown"></span>, <span class="l-h...
+    # td要素かつtodayクラスのものを全部探してくる
     array = soup.find_all("td", class_="today")
 
     return array
@@ -34,13 +34,13 @@ def tomorrowyakyuurl():
     tomorrow = datetime.date.today() + datetime.timedelta(days=1)
     url = "https://baseball.yahoo.co.jp/npb/schedule/?date=%d%02d%02d" % (tomorrow.year, tomorrow.month, tomorrow.day)
 
-    # URLにアクセスする htmlが帰ってくる → <html><head><title>経済、株価、ビジネス、政治のニュース:日経電子版</title></head><body....
+    # URLにアクセスする htmlが帰ってくる
     html = urllib.request.urlopen(url)
 
     # htmlをBeautifulSoupで扱う
     soup = BeautifulSoup(html, "lxml")
 
-    # span要素全てを摘出する→全てのspan要素が配列に入ってかえされます→[<span class="m-wficon triDown"></span>, <span class="l-h...
+    # td要素かつtodayクラスのものを全部探してくる
     array = soup.find_all("td", class_="today")
     return array
 
@@ -90,6 +90,9 @@ async def on_message(message):
         base = "";
         attackteam = "";
         array = todayyakyuurl()
+        #試合がない場合
+        if len(array) == 1:
+            senddata = "今日は試合がないようです。"
         try:
             for i in range(int(len(array)/6)):
                 #試合中
@@ -138,21 +141,27 @@ async def on_message(message):
 
                     homesoup = returnsoup(homep_url)
                     visitersoup = returnsoup(visiterp_url)
+                    #homeera = homesoup.select(".yjM td")[0].text
+                    #visiterera = visitersoup.select(".yjM td")[0].text
 
-                    homeera = homesoup.select(".yjM td")[0].text
-                    visiterera = visitersoup.select(".yjM td")[0].text
 
-                    senddata += array[6*i].text + " " + array[6*i+1].text + " " + array[6*i+2].text + " " + array[6*i+3].text + " " +  array[6*i+4].text + "\n（予）" + array[6*i+5].find_all("a")[0].text.replace(" ","　") + "\n　防御率:" + homeera + "\n（予）" + array[6*i+5].find_all("a")[1].text.replace(" ","　") + "\n　防御率:" + visiterera + "\n\n"
+                    homedata = homesoup.select(".yjM td")
+                    visiterdata = visitersoup.select(".yjM td")
+
+                    senddata += array[6*i].text + " " + array[6*i+1].text + " " + array[6*i+2].text + " " + array[6*i+3].text + " " +  array[6*i+4].text + "\n（予）" \
+                    + array[6*i+5].find_all("a")[0].text.replace(" ","　") + "\n　防御率:" + homedata[0].text + " " +homedata[1].text + "登板 " + homedata[8].text + "勝 " + homedata[9].text + "敗" + \
+                    "\n（予）" + array[6*i+5].find_all("a")[1].text.replace(" ","　") + "\n　防御率:" + visiterdata[0].text + " " + visiterdata[1].text + "登板 " + visiterdata[8].text + "勝 " + visiterdata[9].text + "敗\n\n"
                 else:
                     senddata += array[6*i].text + " " + array[6*i+1].text + " " + array[6*i+2].text + " " + array[6*i+3].text + " " +  array[6*i+4].text + "\n" + array[6*i+5].text.strip().replace("|テレビ放送","\n")
         except Exception as e:
-            senddata = "今日は試合がないようです"
             print(e)
         await client.send_message(message.channel, senddata)
 
     if message.content.startswith('!asita'):
         senddata=""
         array = tomorrowyakyuurl()
+        if len(array) == 1:
+            senddata = "明日は試合がないようです。"
         try:
             for i in range(int(len(array)/6)):
                     homep_url = "https://baseball.yahoo.co.jp" + array[6*i+5].find_all("a")[0].get("href")
@@ -161,17 +170,17 @@ async def on_message(message):
                     homesoup = returnsoup(homep_url)
                     visitersoup = returnsoup(visiterp_url)
 
-                    homeera = homesoup.select(".yjM td")[0].text
-                    visiterera = visitersoup.select(".yjM td")[0].text
+                    homedata = homesoup.select(".yjM td")
+                    visiterdata = visitersoup.select(".yjM td")
 
-                    #teamname = "**" + array[6*i+3].text + "**"
-
-                    senddata += array[6*i].text + " " + array[6*i+1].text + " " + array[6*i+2].text + " " + array[6*i+3].text + " " +  array[6*i+4].text + "\n（予）" + array[6*i+5].find_all("a")[0].text.replace(" ","　") + "\n　防御率:" + homeera + "\n（予）" + array[6*i+5].find_all("a")[1].text.replace(" ","　") + "\n　防御率:" + visiterera + "\n\n"
+                    senddata += array[6*i].text + " " + array[6*i+1].text + " " + array[6*i+2].text + " " + array[6*i+3].text + " " +  array[6*i+4].text + "\n（予）" \
+                    + array[6*i+5].find_all("a")[0].text.replace(" ","　") + "\n　防御率:" + homedata[0].text + " " +homedata[1].text + "登板 " + homedata[8].text + "勝 " + homedata[9].text + "敗" + \
+                    "\n（予）" + array[6*i+5].find_all("a")[1].text.replace(" ","　") + "\n　防御率:" + visiterdata[0].text + " " + visiterdata[1].text + "登板 " + visiterdata[8].text + "勝 " + visiterdata[9].text + "敗\n\n"
         except Exception as e:
-            senddata = "今日は試合がないようです。もしくはまだ予告先発が発表されていません。"
+            senddata = "まだ予告先発が発表されていません。"
             print(e)
         await client.send_message(message.channel, senddata)
-    #試合中の場合,試合状況をキャプチャしてdiscord上に投稿
+    #試合中の場合試合状況をdiscord上に投稿
     if message.content.startswith('!baystars') or message.content.startswith('!carp') or message.content.startswith('!tigers') or message.content.startswith('!giants') or message.content.startswith('!dragons') or message.content.startswith('!swallows')\
     or message.content.startswith('!lions') or message.content.startswith('!fighters') or message.content.startswith('!hawks') or message.content.startswith('!marines') or message.content.startswith('!buffaloes') or message.content.startswith('!eagles')\
     or message.content.startswith('!de') or message.content.startswith('!softbank') or message.content.startswith('!hanshin') or message.content.startswith('!tora') or message.content.startswith('!koi') or message.content.startswith('!yakult') or message.content.startswith('!hiroshima')\
