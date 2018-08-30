@@ -1,7 +1,7 @@
 #coding: utf-8
 
 # 上記で取得したアプリのトークンを入力
-BOT_TOKEN = "NDMwNTYwNjY5Njk2NTI0Mjk5.DaR-aw.sEUcdNZYHdej3RvLc9sfm7tADHA"
+BOT_TOKEN = "xxxx"
 
 # パッケージのインポートとインスタンス作成
 import discord
